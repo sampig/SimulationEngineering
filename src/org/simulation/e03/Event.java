@@ -2,15 +2,40 @@ package org.simulation.e03;
 
 public class Event {
 
-    protected double time = 0.0;
+    protected double time = 0.0; // time when event happens.
 
     public void execute(Simulator sim) {
     }
 
+    /**
+     * compare the event
+     * 
+     * @param e
+     * @return <code>true</code> if this earlier than e; <code>false</code>
+     *         otherwise.
+     */
     public boolean earlierThan(Event e) {
         return this.time < e.time;
     }
 
+    /**
+     * Get corresponding hour according to the minutes of current time. For
+     * instance, 0 represents Day_0 00:00, and 60 represents Day_0 01:00.
+     * 
+     * @param time
+     *            the minutes of current time
+     * @return <tt>Event.TIME_OFF</tt> if it is not working time (00:00-11:00
+     *         and 20:00-24:00);<br>
+     *         <tt>Event.TIME_11</tt> if it is 11:00-12:00;<br>
+     *         <tt>Event.TIME_12</tt> if it is 12:00-13:00;<br>
+     *         <tt>Event.TIME_13</tt> if it is 13:00-14:00;<br>
+     *         <tt>Event.TIME_14</tt> if it is 14:00-15:00;<br>
+     *         <tt>Event.TIME_15</tt> if it is 15:00-16:00;<br>
+     *         <tt>Event.TIME_16</tt> if it is 16:00-17:00;<br>
+     *         <tt>Event.TIME_17</tt> if it is 17:00-18:00;<br>
+     *         <tt>Event.TIME_18</tt> if it is 18:00-19:00;<br>
+     *         <tt>Event.TIME_19</tt> if it is 19:00-20:00;<br>
+     */
     public static int getHour(double time) {
         if (time % 1440 <= 660 || time % 1440 > 1200) { // 0-11, 20-24
             return TIME_OFF;
@@ -36,6 +61,13 @@ public class Event {
         return TIME_OFF;
     }
 
+    /**
+     * in order to be friendly when printing
+     * 
+     * @param time
+     *            the minutes of current time
+     * @return a string format 'time (Day_d hh:mm)'
+     */
     public static String printTime(double time) {
         int day = (int) (time / 1440);
         int hour = (int) (time % 1440 / 60);
@@ -47,16 +79,47 @@ public class Event {
         return this.time;
     }
 
-    public final static int TIME_OFF = 0;
-    public final static int TIME_11 = 1;
-    public final static int TIME_12 = 2;
-    public final static int TIME_13 = 3;
-    public final static int TIME_14 = 4;
-    public final static int TIME_15 = 5;
-    public final static int TIME_16 = 6;
-    public final static int TIME_17 = 7;
-    public final static int TIME_18 = 8;
-    public final static int TIME_19 = 9;
-    public final static int TIME_20 = 10;
+    // constants for the presentation of each hour.
+    /**
+     * rest time
+     */
+    public final static int TIME_OFF = 0; // rest time
+    /**
+     * 11:00-12:00
+     */
+    public final static int TIME_11 = 1; // 11:00-12:00
+    /**
+     * 12:00-13:00
+     */
+    public final static int TIME_12 = 2; // 12:00-13:00
+    /**
+     * 13:00-14:00
+     */
+    public final static int TIME_13 = 3; // 13:00-14:00
+    /**
+     * 14:00-15:00
+     */
+    public final static int TIME_14 = 4; // 14:00-15:00
+    /**
+     * 15:00-16:00
+     */
+    public final static int TIME_15 = 5; // 15:00-16:00
+    /**
+     * 16:00-17:00
+     */
+    public final static int TIME_16 = 6; // 16:00-17:00
+    /**
+     * 17:00-18:00
+     */
+    public final static int TIME_17 = 7; // 17:00-18:00
+    /**
+     * 18:00-19:00
+     */
+    public final static int TIME_18 = 8; // 18:00-19:00
+    /**
+     * 19:00-20:00
+     */
+    public final static int TIME_19 = 9; // 19:00-20:00
+    public final static int TIME_20 = 10; //
 
 }
