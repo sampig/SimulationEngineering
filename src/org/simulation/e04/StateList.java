@@ -8,6 +8,7 @@ public class StateList {
     private int frameCount = 0;
     private double stepTime = 0;
     int stepCount = 0;
+    private double currentTime = 0;
 
     private AcrobatStateImpr state;
 
@@ -31,6 +32,7 @@ public class StateList {
     }
 
     public void integrate() {
+        
         for (AcrobatStateImpr s = state; s != null; s = s.getNext()) {
             s.update(this);
         }
@@ -38,17 +40,22 @@ public class StateList {
     }
 
     public double getTime() {
-        return (int) (frameCount * stepTime * 1000) / 1000.0;
+        return (int) Math.round(currentTime * 1000) / 1000.0; // frameCount * stepTime
+    }
+
+    public void setTime() {
+        currentTime += stepTime;
+        // currentTime = (int) ((currentTime + stepTime) * 1000) / 1000.0;
     }
 
     public void doubleStepTime() {
         this.stepTime *= 2;
-        System.out.println(this.stepTime);
+        System.out.println("doubleStepTime: " + this.stepTime);
     }
 
     public void halveStepTime() {
         this.stepTime /= 2;
-        System.out.println(this.stepTime);
+        System.out.println("halveStepTime: " + this.stepTime);
     }
 
     public int getFrameCount() {
@@ -70,7 +77,7 @@ public class StateList {
     public AcrobatStateImpr getState() {
         return this.state;
     }
-    
+
     public void setState(AcrobatStateImpr state) {
         this.state = state;
     }

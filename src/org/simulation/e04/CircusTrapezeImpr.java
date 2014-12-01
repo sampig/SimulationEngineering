@@ -58,27 +58,24 @@ public class CircusTrapezeImpr {
         theta.setValues(Math.toRadians(45));
         velocity.setValues(0);
         sl.init(step_time);
+        theta.setDer(velocity.getValues());
+        theta.setTime(sl.getTime());
+        velocity.setDer((-g / l * Math.sin(theta.getValues())));
         for (;;) {
-            theta.setDer(velocity.getValues());
-            theta.setTime(sl.getTime());
-            // System.out.println(theta.getTime() + ": " + theta.getValues());
-            velocity.setDer((-g / l * Math.sin(theta.getValues())));
-            //
-            this.adaptStepSize(sl);
-            // Save the data.
-            if (this.e_threshold_ass <= 0 || flag) {
-                this.saveData(theta);
-                flag = false;
-            }
             if (sl.getTime() > this.end_time) {
                 break;
             }
             sl.integrate();
+            sl.setTime();
+            theta.setDer(velocity.getValues());
+            theta.setTime(sl.getTime());
+            velocity.setDer((-g / l * Math.sin(theta.getValues())));
+            this.saveData(theta);
         }
     }
 
     /**
-     * Save the the simualtion data according to different types of methods.
+     * Save the the simulation data according to different types of methods.
      * 
      * @param state
      */
@@ -98,100 +95,6 @@ public class CircusTrapezeImpr {
             }
             break;
         }
-    }
-
-    AcrobatStateImpr[] temp_theta = new AcrobatStateImpr[3];
-    AcrobatStateImpr[] temp_velocity = new AcrobatStateImpr[3];
-    int temp_framecount[] = { 0, 0, 0 };
-    int flag_ass_direction = -1; // -1: halve; 1: double; 0: null.
-    boolean flag = true;
-
-    /**
-     * Adapt the step size. If there is no threshold, skip this.
-     * 
-     * @param list
-     */
-    public void adaptStepSize(StateList list) {
-        if (this.e_threshold_ass <= 0) {
-            return;
-        }
-        switch (list.getState().getMethod().getMethod()) {
-        case MethodType.EULER:
-            testStepSize(list);
-            break;
-        case MethodType.RK2:
-            if ((sl.getFrameCount() & 1) == 0) {
-                testStepSize(list);
-            }
-            break;
-        case MethodType.RK4:
-            if ((sl.getFrameCount() & 3) == 0) {
-                testStepSize(list);
-            }
-            break;
-        }
-    }
-
-    public void testStepSize(StateList list) {
-        switch (list.stepCount) {
-        case 0: // save the current state.
-            temp_theta[0] = list.getState().getNext().clone();
-            temp_velocity[0] = list.getState().clone();
-            temp_framecount[0] = list.getFrameCount();
-            break;
-        case 1: // save the state after one steps for halve
-            if (flag_ass_direction == -1) {
-                temp_theta[1] = list.getState().getNext().clone();
-                temp_velocity[1] = list.getState().clone();
-                temp_framecount[1] = list.getFrameCount();
-                // test for a shorter step and return the test point.
-                list.halveStepTime();
-                list.setFrameCount(temp_framecount[0]);
-                list.setState(temp_velocity[0]);
-            }
-            break;
-        case 2: // save the state after two steps for double
-            if (flag_ass_direction == 1) {
-                temp_theta[1] = list.getState().getNext().clone();
-                temp_velocity[1] = list.getState().clone();
-                temp_framecount[1] = list.getFrameCount();
-                // test for a longer step and return the test point.
-                list.doubleStepTime();
-                list.setFrameCount(temp_framecount[0]);
-                list.setState(temp_velocity[0]);
-            }
-            break;
-        case 3: // save the state after increase or decrease the step size.
-            temp_theta[2] = list.getState().getNext().clone();
-            temp_velocity[2] = list.getState().clone();
-            temp_framecount[2] = list.getFrameCount();
-            double error = Math.abs(temp_theta[2].getValues() - temp_theta[1].getValues());
-            if (error > e_threshold_ass) {
-                // error can not be accepted.
-                list.setFrameCount(temp_framecount[0]);
-                list.setState(temp_velocity[0]);
-            } else {
-                // if the error is accepted, then continue.
-                if (error / e_threshold_ass < 0.001) {
-                    // if the error is too little,
-                    // then try use a larger step on next time.
-                    list.doubleStepTime();
-                }
-                flag = true;
-                // the step size return to the original. don't mess it.
-                if (flag_ass_direction == -1) {
-                    list.doubleStepTime();
-                }
-                if (flag_ass_direction == 1) {
-                    list.halveStepTime();
-                }
-                list.setState(temp_velocity[1]);
-                list.setFrameCount(temp_framecount[1]);
-            }
-            list.stepCount = 0;
-            return;
-        }
-        list.stepCount++;
     }
 
     /**

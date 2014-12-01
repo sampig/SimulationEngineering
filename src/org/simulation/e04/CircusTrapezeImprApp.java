@@ -75,7 +75,7 @@ public class CircusTrapezeImprApp extends Application {
 
         Scene scene = new Scene(lineChart);
         lineChart.getData().add(series1);
-        lineChart.getData().add(series2);
+        //lineChart.getData().add(series2);
         lineChart.getData().add(series3);
         stage.setScene(scene);
         stage.show();
