@@ -12,7 +12,7 @@ public class Test {
         Test t = new Test();
         t.normalDistribution();
         // t.testRandom();
-        t.testClone();
+        t.testBitOperator();
     }
 
     public void print() {
@@ -81,7 +81,7 @@ public class Test {
             }
         }
         System.out.println(map);
-        // 
+        //
         map.clear();
         int start = 1;
         int end = 3;
@@ -90,7 +90,7 @@ public class Test {
         map.put("other", 0);
         for (int i = 0; i < 1000; i++) {
             double d = r.nextGaussian() * ((end - start) / 4.0) + (end + start) / 2.0;
-            //System.out.println(d);
+            // System.out.println(d);
             if (d >= start && d <= end) {
                 int n = map.get(str);
                 map.put(str, n + 1);
@@ -110,7 +110,7 @@ public class Test {
         for (int i = 0; i < 1000; i++) {
             int d = (int) Math.round(r.nextGaussian() * ((end - start) / 4.0) + (end + start)
                     / 2.0);
-            //System.out.println(d);
+            // System.out.println(d);
             if (d >= start && d <= end) {
                 int n = map.get(str);
                 map.put(str, n + 1);
@@ -120,10 +120,10 @@ public class Test {
             }
         }
         System.out.println(map);
-        System.out.println(Math.round(5.1));
-        System.out.println(Math.round(5.9));
+        System.out.println(5.1 + ": " + Math.round(5.1));
+        System.out.println(5.9 + ": " + Math.round(5.9));
     }
-    
+
     public void testClone() {
         AcrobatStateImpr asi = new AcrobatStateImpr();
         AcrobatStateImpr asi2 = asi.clone();
@@ -135,16 +135,22 @@ public class Test {
         System.out.println(asi.getValues());
         System.out.println(asi2.getValues());
         System.out.println(asi3.getValues());
-        AcrobatStateImpr a= new AcrobatStateImpr();
-        AcrobatStateImpr b= new AcrobatStateImpr();
+        AcrobatStateImpr a = new AcrobatStateImpr();
+        AcrobatStateImpr b = new AcrobatStateImpr();
         a.setValues(11);
         a.setNext(b);
-        System.out.println(a.getValues()+","+a.getNext().getValues());
-        AcrobatStateImpr c= a.clone();
-        System.out.println(c.getValues()+","+c.getNext().getValues());
+        System.out.println(a.getValues() + "," + a.getNext().getValues());
+        AcrobatStateImpr c = a.clone();
+        System.out.println(c.getValues() + "," + c.getNext().getValues());
         b.setValues(22);
-        System.out.println(a.getValues()+","+a.getNext().getValues());
-        System.out.println(c.getValues()+","+c.getNext().getValues());
+        System.out.println(a.getValues() + "," + a.getNext().getValues());
+        System.out.println(c.getValues() + "," + c.getNext().getValues());
+    }
+
+    public void testBitOperator() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println(i + ": " + (i & 0x2) + ", " + (i & 2));
+        }
     }
 
 }

@@ -45,7 +45,7 @@ public strictfp class TestModel {
         /*
          * week 04
          */
-        CircusTrapezeImpr cti = new CircusTrapezeImpr(0, 0.1, 0.01,
+        CircusTrapezeImpr cti = new CircusTrapezeImpr(0, 1.02, 0.01,
                 CircusTrapezeImpr.STATUS_STATIC, MethodType.getInstanceEULER());
         cti.setErrorThreshold(0.00001);
         cti.start();
