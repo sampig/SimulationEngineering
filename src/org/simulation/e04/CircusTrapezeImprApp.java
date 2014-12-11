@@ -28,23 +28,29 @@ public class CircusTrapezeImprApp extends Application {
         double end = 10;
         double step = 0.01;
         int status = CircusTrapezeImpr.STATUS_STATIC;
+        double l = 10;
+        double r = 1;
+        double v = -0.3;
 
         CircusTrapezeImpr ctiEULER = new CircusTrapezeImpr(start, end, step, status,
                 MethodType.getInstanceEULER());
+        ctiEULER.setParameters(l, r, v);
         ctiEULER.start();
         ctiEULER.outputResult();
         List<AcrobatStateImpr> listEULER = ctiEULER.getList();
 
         CircusTrapezeImpr ctiRK2 = new CircusTrapezeImpr(start, end, step, status,
                 MethodType.getInstanceRK2());
+        ctiRK2.setParameters(l, r, v);
         ctiRK2.start();
-        //ctiRK2.outputResult();
+        ctiRK2.outputResult();
         List<AcrobatStateImpr> listRK2 = ctiRK2.getList();
 
         CircusTrapezeImpr ctiRK4 = new CircusTrapezeImpr(start, end, step, status,
                 MethodType.getInstanceRK4());
+        ctiRK4.setParameters(l, r, v);
         ctiRK4.start();
-        ctiRK4.outputResult();
+        //ctiRK4.outputResult();
         List<AcrobatStateImpr> listRK4 = ctiRK4.getList();
 
         lineChart.setTitle("Improvement of Circus Trapeze Model: ");
@@ -75,8 +81,8 @@ public class CircusTrapezeImprApp extends Application {
 
         Scene scene = new Scene(lineChart);
         lineChart.getData().add(series1);
-        //lineChart.getData().add(series2);
-        lineChart.getData().add(series3);
+        lineChart.getData().add(series2);
+        //lineChart.getData().add(series3);
         stage.setScene(scene);
         stage.show();
     }

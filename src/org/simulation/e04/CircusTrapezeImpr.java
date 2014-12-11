@@ -37,6 +37,8 @@ public class CircusTrapezeImpr {
         velocity.init(sl, (new MethodType(MethodType.EULER)));
         this.run_mode = STATUS_STATIC;
         this.method = new MethodType(MethodType.EULER);
+        theta.setValues(Math.toRadians(45));
+        velocity.setValues(0);
     }
 
     public CircusTrapezeImpr(double start_time, double end_time, double step_time,
@@ -49,14 +51,14 @@ public class CircusTrapezeImpr {
         this.method = method;
         this.theta.init(this.sl, method);
         this.velocity.init(this.sl, method);
+        theta.setValues(Math.toRadians(45));
+        velocity.setValues(0);
     }
 
     /**
      * Start running the simulation.
      */
     public void start() {
-        theta.setValues(Math.toRadians(45));
-        velocity.setValues(0);
         sl.init(step_time);
         theta.setDer(velocity.getValues());
         theta.setTime(sl.getTime());
@@ -109,6 +111,51 @@ public class CircusTrapezeImpr {
         System.out.println(state_list.size());
     }
 
+    /**
+     * Calculate the period.
+     * 
+     * @return the period
+     */
+    public double getPeriod() {
+        double period = 0;
+        double t1 = 0, t2 = 0;
+        int i = 0;
+        AcrobatStateImpr as1, as2;
+        for (; i < state_list.size() - 1; i++) {
+            as1 = state_list.get(i);
+            as2 = state_list.get(i + 1);
+            if (as2.getValues() > as1.getValues()) {
+                t1 = as1.getTime();
+                i++;
+                break;
+            }
+        }
+        for (; i < state_list.size() - 1; i++) {
+            as1 = state_list.get(i);
+            as2 = state_list.get(i + 1);
+            if (as2.getValues() < as1.getValues()) {
+                i++;
+                break;
+            }
+        }
+        for (; i < state_list.size() - 1; i++) {
+            as1 = state_list.get(i);
+            as2 = state_list.get(i + 1);
+            if (as2.getValues() > as1.getValues()) {
+                t2 = as1.getTime();
+                break;
+            }
+        }
+        period = t2 - t1;
+        return Math.round(period * 1000) / 1000.0;
+    }
+
+    public void setParameters(double l, double angle, double velocity) {
+        this.l = l;
+        this.theta.setValues(angle);
+        this.velocity.setValues(velocity);
+    }
+
     public StateList getStateList() {
         return sl;
     }
@@ -143,6 +190,6 @@ public class CircusTrapezeImpr {
     /**
      * The length of the rope.
      */
-    public final static double LEIGHT = 5.0;
+    public final static double LEIGHT = 1.0;
 
 }
