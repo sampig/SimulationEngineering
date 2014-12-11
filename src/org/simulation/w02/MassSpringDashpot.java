@@ -45,9 +45,9 @@ public strictfp class MassSpringDashpot {
         for (; t <= end_time;) {
             double x_temp = x;
             x += v * delta_time;
-            v -= (k * x_temp + b * v) * delta_time;
+            v -= (k * x_temp + b * v) * delta_time / m;
             t += delta_time;
-            state = new MassState(Math.round(t*100.0)/100.0, x);
+            state = new MassState(Math.round(t * 100.0) / 100.0, x);
             stateList.add(state);
         }
     }
@@ -62,7 +62,8 @@ public strictfp class MassSpringDashpot {
     public class MassState {
         private double time;
         private double position;
-        //private double velocity;
+
+        // private double velocity;
 
         public MassState() {
         }
