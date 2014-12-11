@@ -32,7 +32,7 @@ public class CircusTrapezeASSApp extends Application {
         lineChart.setAlternativeRowFillVisible(false);
 
         CircusTrapezeASS ct = new CircusTrapezeASS(0, 5);
-        ct.e_threshold_ass = 0.00001;
+        ct.e_threshold_ass = 0.000001;
         ct.start(CircusTrapezeASS.STATUS_STATIC);
         ct.outputResult();
         List<AcrobatState> list = ct.getState_list();

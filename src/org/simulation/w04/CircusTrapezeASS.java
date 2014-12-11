@@ -28,8 +28,9 @@ public class CircusTrapezeASS {
     private List<AcrobatState> state_list = new ArrayList<AcrobatState>(0);
     private AcrobatState state = new AcrobatState();
 
-    //
+    // error threshold.
     double e_threshold_ass = 0.00001;
+    // define a minimum number
     double min_num = 0.0001;
 
     public CircusTrapezeASS() {
@@ -58,6 +59,7 @@ public class CircusTrapezeASS {
 
         if (run_mode == STATUS_STATIC) {
             while (t <= end_time) {
+                // Adapt the step size.
                 for (int flag_direction = -1;;) {
                     // flag_direction: -1: halve; 1: double.
                     double[] th_temp = new double[2]; // angles
@@ -113,11 +115,15 @@ public class CircusTrapezeASS {
 
     }
 
+    /**
+     * output the results.
+     */
     public void outputResult() {
         for (int i = 0; i < state_list.size(); i++) {
             System.out.print("Time: " + state_list.get(i).getTime() + ", ");
-            System.out.println("Theta: " + state_list.get(i).getAngle() + ","
-                    + Math.toDegrees(state_list.get(i).getAngle()) + ".");
+            System.out.print("Theta: " + state_list.get(i).getAngle() + ","
+                    + Math.toDegrees(state_list.get(i).getAngle()) + ", ");
+            System.out.println("Velocity: " + state_list.get(i).getAngle_velocity() + ", ");
         }
     }
 
