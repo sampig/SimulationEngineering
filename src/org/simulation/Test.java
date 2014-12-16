@@ -10,9 +10,9 @@ public class Test {
 
     public static void main(String... strings) {
         Test t = new Test();
-        t.normalDistribution();
-        // t.testRandom();
-        t.testBitOperator();
+        //t.normalDistribution();
+        t.testRandom();
+        //t.testBitOperator();
     }
 
     public void print() {
@@ -24,6 +24,7 @@ public class Test {
 
     public void testRandom() {
         Random r = new Random();
+        r.setSeed(1);
         Map<Integer, Integer> map = new HashMap<>(0);
         int times = 10000;
         for (int i = 0; i < times; i++) {
