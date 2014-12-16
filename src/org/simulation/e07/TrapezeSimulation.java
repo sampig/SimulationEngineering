@@ -57,9 +57,15 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
     // dashboard
     private TextField tfPort;
     private TextField tfLength, tfStart, tfEnd, tfStep;
-    private Button bStart;
+    private Button bSetUDP, bStart;
     TextArea taLog;
+
+    // graph
     Canvas canvas;
+    double x1 = 150, y1 = 50, len = l * 30;
+    double x2 = x1 - len * Math.sin(th);
+    double y2 = y1 + len * Math.cos(th);
+    private double radius = 15;
 
     // connection
     // UDP Server
@@ -84,6 +90,8 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         tfStart = new TextField();
         tfEnd = new TextField();
         tfStep = new TextField();
+        bSetUDP = new Button("Set UDP");
+        bSetUDP.setOnAction(this);
         bStart = new Button("Start"); // start button
         bStart.setOnAction(this);
         taLog = new TextArea(); // log text
@@ -92,9 +100,13 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         canvas = new Canvas(300, 300);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         this.pendulum(gc);
+        Group g = new Group();
+        g.minWidth(300);
+        g.minHeight(300);
 
         // buttons:
         HBox hbox = new HBox();
+        hbox.getChildren().add(bSetUDP);
         hbox.getChildren().add(bStart);
         // input:
         HBox parabox = new HBox();
@@ -103,12 +115,17 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         parabox.getChildren().add(tfEnd);
         parabox.getChildren().add(tfStep);
 
+        // graph:
+        HBox gbox = new HBox();
+        gbox.getChildren().add(canvas);
+
         VBox vbox = new VBox();
         vbox.getChildren().add(parabox);
         vbox.getChildren().add(tfPort);
         vbox.getChildren().add(hbox);
         vbox.getChildren().add(taLog);
-        vbox.getChildren().add(canvas);
+        // vbox.getChildren().add(g);
+        vbox.getChildren().add(gbox);
 
         Group group = new Group();
         group.getChildren().add(vbox);
@@ -118,31 +135,35 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
     }
 
     /**
-     * Draw the line.
+     * Draw the line (rope) and the circle (artist).
      * 
      * @param gc
      */
     public void pendulum(GraphicsContext gc) {
+        gc.clearRect(0, 0, 300, 300);
         gc.setFill(Color.ALICEBLUE);
         gc.fillRect(10, 10, 290, 290);
-        gc.strokeLine(150, 50, 50, 150);
-
+        // draw the ceiling.
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(5);
+        gc.strokeLine(10, y1, 290, y1);
+        // draw the line
+        gc.setLineWidth(2);
+        gc.setStroke(Color.RED);
+        gc.strokeLine(x1, y1, x2, y2);
+        gc.setFill(Color.PINK);
+        gc.fillOval(x2 - radius / 2, y2 - radius / 2, radius, radius);
     }
 
-    /**
-     * Draw the line.
-     * 
-     * @param gc
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     */
-    public void pendulum(GraphicsContext gc, double x1, double y1, double x2, double y2) {
-        gc.clearRect(10, 10, 290, 290);
+    public void pendulum(GraphicsContext gc, double angle) {
+        gc.clearRect(0, 0, 300, 300);
         gc.setFill(Color.ALICEBLUE);
         gc.fillRect(10, 10, 290, 290);
-        gc.strokeLine(x1, y1, x2, y2);
+        gc.strokeLine(x1, y1, x1 - len * Math.sin(angle), y1 + len * Math.cos(angle));
+    }
+
+    public void refreshDashboard() {
+        ;
     }
 
     /**
@@ -156,7 +177,7 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         } catch (Exception e) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    taLog.appendText("Length must be numerical.\n");
+                    taLog.appendText("Length must be numerical. Default: " + l + "\n");
                 }
             });
         }
@@ -167,7 +188,8 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         } catch (Exception e) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    taLog.appendText("Start time must be numerical.\n");
+                    taLog.appendText("Start time must be numerical. Default: " + start_time
+                            + "\n");
                 }
             });
         }
@@ -178,7 +200,7 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         } catch (Exception e) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    taLog.appendText("End time must be numerical.\n");
+                    taLog.appendText("End time must be numerical. Default: " + end_time + "\n");
                 }
             });
         }
@@ -189,7 +211,8 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         } catch (Exception e) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    taLog.appendText("Step size must be numerical.\n");
+                    taLog.appendText("Step size must be numerical. Default: " + time_step_size
+                            + "\n");
                 }
             });
         }
@@ -200,14 +223,16 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         } catch (Exception e) {
             Platform.runLater(new Runnable() {
                 public void run() {
-                    taLog.appendText("Port must be numerical.\n");
+                    taLog.appendText("Port must be numerical. Default: " + port + "\n");
                 }
             });
         }
     }
 
-    @Override
-    public void run() {
+    /**
+     * Set UDP connection.
+     */
+    protected void setUDP() {
         // set the parameters.
         this.setParameters();
         // set the UDP socket.
@@ -224,13 +249,10 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         // start a thread to accept the change of the artist's position.
         thread = new TrapezeThread(this, socket);
         thread.start();
+    }
 
-        // waiting for the artist
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void run() {
 
         ByteArrayOutputStream out = null;
         ObjectOutputStream os = null;
@@ -249,7 +271,7 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
             th_v += (-g / l * Math.sin(th_temp)) * time_step_size;
             t += time_step_size;
             // print the state every 0.2 second.
-            if (i % ((int) (0.2 / time_step_size)) == 0) {
+            if (i % ((int) (0.5 / time_step_size)) == 0) {
                 Platform.runLater(new Runnable() {
                     public void run() {
                         String str = printState(Math.round(t * 1000) / 1000.0, th, th_v, l);
@@ -258,6 +280,16 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
                     }
                 });
             }
+            // fresh the line:
+            x2 = x1 - len * Math.sin(th);
+            y2 = y1 + len * Math.cos(th);
+            Platform.runLater(new Runnable() {
+                public void run() {
+                    GraphicsContext gc = canvas.getGraphicsContext2D();
+                    pendulum(gc);
+                    refreshDashboard();
+                }
+            });
             if (IPAddress == null) {
                 continue;
             }
@@ -281,6 +313,8 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
         if (e.getSource() == this.bStart) {
             Thread thread = new Thread(this);
             thread.start();
+        } else if (e.getSource() == this.bSetUDP) {
+            this.setUDP();
         }
     }
 
@@ -294,8 +328,17 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
     }
 
     public void stop() {
+        Thread thread = new Thread(this);
         if (thread != null) {
             thread.interrupt();
+            System.out.println("*****TrapezeSimulation thread stops.");
+        }
+        if (this.thread != null) {
+            this.thread.interrupt();
+            System.out.println("*****TrapezeThread thread stops.");
+        }
+        if (socket != null) {
+            socket.close();
         }
         if (Thread.currentThread() != null) {
             Thread.currentThread().interrupt();
@@ -361,10 +404,21 @@ public class TrapezeSimulation extends Application implements EventHandler<Actio
                     });
                     // change the length of the mass in the simulation.
                     simulation.l = simulation.length + data.getValues();
+                    simulation.len = simulation.l * 30;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+            } finally {
+                if (socket != null) {
+                    socket.close();
+                }
             }
+        }
+
+        public void interupt() {
+            if (socket != null) {
+                socket.close();
+            }
+            super.interrupt();
         }
     }
 

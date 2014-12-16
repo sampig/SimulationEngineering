@@ -201,6 +201,17 @@ public class ArtistSimulation extends Application implements EventHandler<Action
         }
     }
 
+    public void stop() {
+        if (socket != null) {
+            socket.close();
+        }
+        try {
+            super.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String... strings) {
         launch(strings);
     }
